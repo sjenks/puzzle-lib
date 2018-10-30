@@ -1,5 +1,3 @@
-// https://www.npmjs.com/package/trie-prefix-tree
-
 class WordSearchSolver {
   private _matrix: string[][];
 

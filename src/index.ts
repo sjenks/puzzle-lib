@@ -36,3 +36,6 @@ export { default as SemaphoreDegrees } from './Semaphore/SemaphoreDegrees';
 export { default as SemaphoreDirection } from './Semaphore/SemaphoreDirection';
 
 export {default as WordSearchSolver } from './WordSearch/WordSearchSolver';
+export {default as LineSolver } from './WordSearch/LineSolver';
+export {default as WordSearchPoint } from './WordSearch/WordSearchPoint';
+export {default as WordSearchResult } from './WordSearch/WordSearchResult';
