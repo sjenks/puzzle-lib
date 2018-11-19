@@ -1,24 +1,25 @@
+import { Trie } from 'prefix-trie-ts';
 import WordSearchPoint from './WordSearchPoint';
 import WordSearchResult from './WordSearchResult';
 
 class LineSolver {
   private _matrix: string[][];
   private _directions: any;
-  private _trie: trie-prefix-tree;
+  private _trie: Trie;
 
   constructor(matrix: string[][]) {
     this._matrix = matrix;
 
-    this._directions = {
-      Down: [0, -1],
-      Left: [-1, 0],
-      Right: [1, 0],
-      Up: [0, 1],
-    };
+    this._directions = [
+      [0, 1],
+      [-1, 0],
+      [1, 0],
+      [0, -1],
+    ];
   }
 
   public findWords(words: string[]): WordSearchResult[] {
-    this._trie = new trie([]);
+    this._trie = new Trie([]);
     for (const word of words) {
       this._trie.addWord(word);
     }
@@ -26,20 +27,22 @@ class LineSolver {
   }
 
   private search(): WordSearchResult[] {
-    const results: WordSearchResult[] = Array();
+    let results: WordSearchResult[] = Array();
     for (let i = 0; i < this._matrix.length; i++) {
-      for (let j = 0; j < this._matrix[0].length; j++) {
-        const pointResults = this.startSearch(new WordSearchPoint(i, j));
-        results.concat(pointResults);
+      for (let j = 0; j < this._matrix[i].length; j++) {
+        const point = new WordSearchPoint(i, j);
+        const pointResults = this.startSearch(point);
+        results = results.concat(pointResults);
       }
     }
     return results;
   }
 
   private startSearch(start: WordSearchPoint): WordSearchResult[] {
-    const results: WordSearchResult[] = Array();
-    for (const direction of this._directions) {
-      results.concat(this.checkDirection(start, direction));
+    let results: WordSearchResult[] = Array();
+    for (const translation of this._directions) {
+      const directionalResults = this.checkDirection(start, translation);
+      results = results.concat(directionalResults);
     }
     return results;
   }
@@ -54,19 +57,22 @@ class LineSolver {
     while (this.isInBounds(currentPoint)) {
       currentString = currentString + this._matrix[currentPoint.i][currentPoint.j];
 
+      // Get the candidates with the current prefix string
+      const wordsWithPrefix = this._trie.getPrefix(currentString);
+
       // No point in going on, we've run out of possibilities
-      if (!this._trie.isPrefix(currentString)) {
+      if (wordsWithPrefix.length === 0) {
         break;
       }
 
-      // Is the exact word in the trie?  Save it.
-      const wordsWithPrefix = this._trie.hasWord(currentString);
-      if (wordsWithPrefix) {
-        const result = new WordSearchResult(currentString, pointHistory);
-        results.push(result);
+      pointHistory.push(new WordSearchPoint(currentPoint.i, currentPoint.j));
+
+      // Is a candidate an exact match for the current search string? Save it.
+      if (wordsWithPrefix.indexOf(currentString) !== -1) {
+        const foundWord = new WordSearchResult(currentString, pointHistory);
+        results.push(foundWord);
       }
 
-      pointHistory.push(new WordSearchPoint(currentPoint.i, currentPoint.j));
       const next = new WordSearchPoint(currentPoint.i + direction[0], currentPoint.j + direction[1]);
       currentPoint = next;
     }

@@ -5,6 +5,7 @@ class WordSearchResult {
   public points: WordSearchPoint[];
   constructor(word: string, wordPoints: WordSearchPoint[]) {
     this.word = word;
+    this.points = Array();
     wordPoints.forEach((element) => {
       this.points.push(element);
     });
